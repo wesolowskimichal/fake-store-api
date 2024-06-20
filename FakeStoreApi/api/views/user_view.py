@@ -3,11 +3,19 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from api.serializers.user_serializer import *
 
 class UserRegisterView(generics.CreateAPIView):
+    """
+    Creating new User
+    """
+
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
     permission_classes  = [AllowAny]
 
 class UserDetailsView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Managing currently logged User
+    """
+
     serializer_class = UserDetailsSerializer
     permission_classes = [IsAuthenticated]
 
@@ -19,7 +27,7 @@ class UserDetailsView(generics.RetrieveUpdateDestroyAPIView):
         return self.get_queryset()
     
     def get_serializer_class(self):
-        if(self.request.method == 'PUT'):
+        if self.request.method == 'PUT':
             return UserUpdateSerializer
         return UserDetailsSerializer
     
