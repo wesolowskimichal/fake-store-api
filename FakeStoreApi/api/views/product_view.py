@@ -1,10 +1,13 @@
-from rest_framework import generics
+from rest_framework import generics, filters
 from api.models import ProductImage, Product
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from api.serializers.product_serializer import *
 
 class ProductListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    ordering_fields = ['title', 'price', 'createdAt']
+    search_fields = ['title']
 
     def get_queryset(self):
         user = self.request.user
