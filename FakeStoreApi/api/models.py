@@ -7,7 +7,6 @@ from django.contrib.auth.models import AbstractUser
 # User Model
 class User(AbstractUser):
     def __str__(self):
-        self.first_name
         return self.username
     
     def upload_to(self, filename):
@@ -53,7 +52,9 @@ class Product(models.Model):
     title = models.CharField(help_text='Required. Product\'s name', unique=False, blank=False, max_length=150)
     price = models.FloatField(help_text='Required. Product\'s price', unique=False, blank=False, validators=[MinValueValidator(0.0)])
     description = models.TextField(help_text='Product\'s description', blank=True)
+    createdAt = models.DateTimeField(help_text='Publication time of product', auto_now_add=True)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
+    seller = models.ForeignKey(User, related_name='products',on_delete=models.CASCADE)
 
 
 

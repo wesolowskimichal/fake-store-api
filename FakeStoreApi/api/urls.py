@@ -1,6 +1,7 @@
 from api.views.user_view import *
 from api.views.category_view import *
 from api.views.categories_view import *
+from api.views.product_view import *
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import path, include
 
@@ -16,5 +17,7 @@ urlpatterns = [
     path('category/', CategoryAddView.as_view(), name='addCategory'),
     path('category/<uuid:id>/', CategoryEditView.as_view(), name='categoryId'),
     # Categories
-    path('categories/', CategoriesView.as_view(), name='getAllCategories')
+    path('categories/', CategoriesView.as_view(), name='getAllCategories'),
+    # Products
+    path('products/', ProductListCreateView.as_view(), name='Managing_products')
 ]
