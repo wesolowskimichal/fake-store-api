@@ -34,8 +34,3 @@ class UserCreateSerializer(serializers.ModelSerializer):
         )
         return user
     
-
-class UserUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['email', 'first_name', 'last_name', 'image']

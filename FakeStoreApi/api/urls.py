@@ -2,6 +2,7 @@ from api.views.user_view import *
 from api.views.category_view import *
 from api.views.categories_view import *
 from api.views.product_view import *
+from api.views.cart_view import *
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import path, include
 
@@ -19,5 +20,10 @@ urlpatterns = [
     # Categories
     path('categories/', CategoriesView.as_view(), name='getAllCategories'),
     # Products
-    path('products/', ProductListCreateView.as_view(), name='Managing_products')
+    path('products/', ProductListCreateView.as_view(), name='Managing_products'),
+    # Cart
+    path('cart/', CartRetrieveView.as_view(), name="getCart"),
+    path('cart/products/', CartAddProductView.as_view(), name="addProductToCart"),
+    # path('cart/products/<uuid:id>/', CartRemoveProductView.as_view(), name='removeProductFromCart'),
+    path('cart/products/<uuid:id>/', CartEditProdcutView.as_view(), name='ProductFromCart')
 ]

@@ -3,6 +3,9 @@ from django.db import models
 from django.urls import reverse
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 # User Model
 class User(AbstractUser):
@@ -11,9 +14,6 @@ class User(AbstractUser):
     
     def upload_to(self, filename):
         return f'users/{self.id}/{filename}'
-    
-    def get_absolute_url(self):
-        return reverse('user-details-id', kwargs={'id': self.pk})
     
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -32,9 +32,6 @@ class Category(models.Model):
     def upload_to(self, filename):
         return f'categories/{self.id}/{filename}'
     
-    def get_absolute_url(self):
-        return reverse('category-details-id', kwargs={'id': self.pk})
-    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(help_text='Required. Category\'s name', unique=False, blank=False, max_length=150)
     image = models.ImageField(upload_to=upload_to, default='/defaults/category-default.jpg')
@@ -45,9 +42,6 @@ class Product(models.Model):
     def __str__(self) -> str:
         return self.title
     
-    def get_absolute_url(self):
-        return reverse('product-details-id', kwargs={'id': self.pk})
-    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(help_text='Required. Product\'s name', unique=False, blank=False, max_length=150)
     price = models.FloatField(help_text='Required. Product\'s price', unique=False, blank=False, validators=[MinValueValidator(0.0)])
@@ -55,6 +49,12 @@ class Product(models.Model):
     createdAt = models.DateTimeField(help_text='Publication time of product', auto_now_add=True)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     seller = models.ForeignKey(User, related_name='products',on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(10000)])
+
+@receiver(post_save, sender=User)
+def create_cart_for_new_user(sender, instance, created, **kwargs):
+    if created:
+        Cart.objects.create(user=instance)
 
 
 
@@ -71,3 +71,24 @@ class ProductImage(models.Model):
     image = models.ImageField(upload_to=upload_to, default='/defaults/product-default.jpg')
 
     
+# Cart Model
+class Cart(models.Model):
+    def __str__(self) -> str:
+        return super().__str__()
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(User, related_name='cart', on_delete=models.CASCADE)
+
+
+# CartProduct Model
+class CartProduct(models.Model):
+    def __str__(self):
+        return f'{self.quantity} of {self.product.title} in cart of {self.cart.user.username}'
+
+    class Meta:
+        unique_together = ('cart', 'product')
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    cart = models.ForeignKey(Cart, related_name='cart_porducts', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='products', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)

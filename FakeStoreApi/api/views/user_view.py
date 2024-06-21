@@ -25,10 +25,4 @@ class UserDetailsView(generics.RetrieveUpdateDestroyAPIView):
     
     def get_object(self):
         return self.get_queryset()
-    
-    def get_serializer_class(self):
-        if self.request.method == 'PUT':
-            return UserUpdateSerializer
-        return UserDetailsSerializer
-    
 
